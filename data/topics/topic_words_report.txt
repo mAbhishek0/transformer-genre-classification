@@ -1,0 +1,32 @@
+K=30 | sigma_sq=0.0601 | top_k=3 | mean_coh=0.4984
+
+Topic 00 (n=1113, coh=0.465): dog, christmas, boy, cat, santa, family, new, world, animals, home
+Topic 01 (n= 919, coh=0.444): music, band, rock, singer, musical, life, concert, new, tour, film
+Topic 02 (n=1404, coh=0.551): woman, young, husband, murder, young woman, wife, death, girl, man, life
+Topic 03 (n= 940, coh=0.502): police, cop, detective, crime, officer, man, new, criminal, drug, cops
+Topic 04 (n=1170, coh=0.499): life, young, love, father, family, man, italian, spanish, old, son
+Topic 05 (n=1259, coh=0.522): family, sir, henry, father, novel, mr, house, wife, england, son
+Topic 06 (n=1368, coh=0.552): murder, killer, police, serial, man, crime, detective, murders, case, serial killer
+Topic 07 (n= 673, coh=0.511): russian, russia, moscow, soviet, ivan, life, war, film, story, young
+Topic 08 (n=1098, coh=0.475): documentary, film, world, footage, life, american, feature, people, interviews, documentary film
+Topic 09 (n=1237, coh=0.448): earth, scientist, space, planet, world, time, human, man, doctor, dr
+Topic 10 (n=1314, coh=0.497): school, high school, high, girl, students, student, girls, college, friends, year
+Topic 11 (n=1332, coh=0.480): woman, life, young, women, girl, new, actress, world, mother, young woman
+Topic 12 (n=1576, coh=0.507): love, young, life, father, family, japanese, film, man, japan, son
+Topic 13 (n=1579, coh=0.485): story, novel, life, book, man, world, young, stories, based, set
+Topic 14 (n=1094, coh=0.447): earth, group, people, world, alien, planet, human, aliens, town, humans
+Topic 15 (n=1466, coh=0.500): film, movie, director, directed, films, comedy, life, story, based, man
+Topic 16 (n= 969, coh=0.492): war, army, soldiers, world war, world, american, soldier, military, german, ii
+Topic 17 (n=1425, coh=0.518): king, battle, dragon, world, power, evil, city, new, time, army
+Topic 18 (n= 699, coh=0.493): nazi, war, germany, german, jewish, world war, hitler, world, ii, war ii
+Topic 19 (n=1489, coh=0.535): love, woman, man, young, couple, story, life, husband, married, relationship
+Topic 20 (n=1135, coh=0.495): money, bank, man, life, job, new, young, robbery, million, business
+Topic 21 (n= 984, coh=0.525): agent, cia, secret, fbi, government, detective, spy, terrorist, agents, undercover
+Topic 22 (n= 891, coh=0.527): princess, magic, girl, fairy, young, witch, magical, prince, old, king
+Topic 23 (n=1462, coh=0.516): man, life, father, town, family, wife, friend, brother, jack, new
+Topic 24 (n= 798, coh=0.445): american, story, gang, war, city, new, mexico, black, world, mexican
+Topic 25 (n=1835, coh=0.522): love, married, life, husband, new, relationship, friend, family, friends, marriage
+Topic 26 (n=1511, coh=0.524): family, mother, father, son, young, daughter, old, home, life, house
+Topic 27 (n= 976, coh=0.491): ship, crew, island, captain, sea, planet, ocean, boat, submarine, world
+Topic 28 (n=1428, coh=0.456): comedy, life, comedian, new, special, man, stand, tv, star, time
+Topic 29 (n= 960, coh=0.527): vampire, vampires, demon, evil, blood, angel, world, night, group, house

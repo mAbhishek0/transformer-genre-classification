@@ -1,0 +1,294 @@
+=================================================================
+RoBERTa-base optimal training started.
+Total steps: 4520 | Steps/epoch: 565
+Batch size: 64 | Max len: 512 | Precision: FP16
+Epochs: 8 | Patience: 5 | Scheduler: Cosine
+Gradient checkpointing: ON + batch_size=64 (maximizes VRAM without OOM)
+Threshold: per-genre sweep 0.20 → 0.85
+=================================================================
+
+─────────────────────────────────────────────────────────────────
+EPOCH 1/8  |  Elapsed: 0:00:00
+─────────────────────────────────────────────────────────────────
+  Step  100/565  |  Loss: 1.2174  |  Step: 2.19s  |  Epoch ETA: 0:16:01  |  Total ETA: 2:32:20
+  Step  200/565  |  Loss: 1.1216  |  Step: 2.15s  |  Epoch ETA: 0:12:52  |  Total ETA: 2:32:28
+  Step  300/565  |  Loss: 1.0005  |  Step: 2.17s  |  Epoch ETA: 0:09:26  |  Total ETA: 2:30:28
+  Step  400/565  |  Loss: 0.9147  |  Step: 2.20s  |  Epoch ETA: 0:05:54  |  Total ETA: 2:27:28
+  Step  500/565  |  Loss: 0.8587  |  Step: 2.17s  |  Epoch ETA: 0:02:20  |  Total ETA: 2:24:22
+
+Epoch 1 training done in 0:20:17
+  Per-genre threshold tuning:
+    Action               best_t=0.80  F1=0.6112
+    Comedy               best_t=0.65  F1=0.6403
+    Drama                best_t=0.40  F1=0.7111
+    Horror               best_t=0.80  F1=0.6594
+    Thriller             best_t=0.65  F1=0.6893
+    Sci-Fi               best_t=0.65  F1=0.7238
+    Fantasy              best_t=0.80  F1=0.5679
+    Romance              best_t=0.80  F1=0.5334
+    Animation            best_t=0.80  F1=0.5066
+    Documentary          best_t=0.75  F1=0.8227
+    Literary Fiction     best_t=0.80  F1=0.6115
+    Non-Fiction          best_t=0.80  F1=0.7627
+
+Validation done in 0:04:07
+Epoch 1/8  |  Val Macro-F1: 0.6533
+Total elapsed: 0:24:26  |  Remaining ETA: 2:51:02
+  -> Saved best model
+  -> Thresholds: {'Action': np.float64(0.8), 'Comedy': np.float64(0.65), 'Drama': np.float64(0.4), 'Horror': np.float64(0.8), 'Thriller': np.float64(0.65), 'Sci-Fi': np.float64(0.65), 'Fantasy': np.float64(0.8), 'Romance': np.float64(0.8), 'Animation': np.float64(0.8), 'Documentary': np.float64(0.75), 'Literary Fiction': np.float64(0.8), 'Non-Fiction': np.float64(0.8)}
+
+─────────────────────────────────────────────────────────────────
+EPOCH 2/8  |  Elapsed: 0:24:29
+─────────────────────────────────────────────────────────────────
+  Step  100/565  |  Loss: 0.5916  |  Step: 2.22s  |  Epoch ETA: 0:16:56  |  Total ETA: 2:43:03
+  Step  200/565  |  Loss: 0.5836  |  Step: 2.16s  |  Epoch ETA: 0:13:15  |  Total ETA: 2:35:50
+  Step  300/565  |  Loss: 0.5749  |  Step: 2.18s  |  Epoch ETA: 0:09:37  |  Total ETA: 2:29:29
+  Step  400/565  |  Loss: 0.5682  |  Step: 2.17s  |  Epoch ETA: 0:05:59  |  Total ETA: 2:23:42
+  Step  500/565  |  Loss: 0.5625  |  Step: 2.17s  |  Epoch ETA: 0:02:21  |  Total ETA: 2:18:19
+
+Epoch 2 training done in 0:20:28
+  Per-genre threshold tuning:
+    Action               best_t=0.65  F1=0.6288
+    Comedy               best_t=0.40  F1=0.6707
+    Drama                best_t=0.55  F1=0.7328
+    Horror               best_t=0.80  F1=0.6826
+    Thriller             best_t=0.75  F1=0.7054
+    Sci-Fi               best_t=0.80  F1=0.7339
+    Fantasy              best_t=0.80  F1=0.5856
+    Romance              best_t=0.70  F1=0.5549
+    Animation            best_t=0.80  F1=0.5412
+    Documentary          best_t=0.80  F1=0.8239
+    Literary Fiction     best_t=0.75  F1=0.6229
+    Non-Fiction          best_t=0.75  F1=0.6748
+
+Validation done in 0:04:07
+Epoch 2/8  |  Val Macro-F1: 0.6631
+Total elapsed: 0:49:06  |  Remaining ETA: 2:27:19
+  -> Saved best model
+  -> Thresholds: {'Action': np.float64(0.65), 'Comedy': np.float64(0.4), 'Drama': np.float64(0.55), 'Horror': np.float64(0.8), 'Thriller': np.float64(0.75), 'Sci-Fi': np.float64(0.8), 'Fantasy': np.float64(0.8), 'Romance': np.float64(0.7), 'Animation': np.float64(0.8), 'Documentary': np.float64(0.8), 'Literary Fiction': np.float64(0.75), 'Non-Fiction': np.float64(0.75)}
+
+─────────────────────────────────────────────────────────────────
+EPOCH 3/8  |  Elapsed: 0:49:11
+─────────────────────────────────────────────────────────────────
+  Step  100/565  |  Loss: 0.4891  |  Step: 2.18s  |  Epoch ETA: 0:16:54  |  Total ETA: 2:21:19
+  Step  200/565  |  Loss: 0.4871  |  Step: 2.15s  |  Epoch ETA: 0:13:13  |  Total ETA: 2:15:22
+  Step  300/565  |  Loss: 0.4850  |  Step: 2.16s  |  Epoch ETA: 0:09:36  |  Total ETA: 2:09:48
+  Step  400/565  |  Loss: 0.4854  |  Step: 2.15s  |  Epoch ETA: 0:05:59  |  Total ETA: 2:04:30
+  Step  500/565  |  Loss: 0.4837  |  Step: 2.19s  |  Epoch ETA: 0:02:21  |  Total ETA: 1:59:23
+
+Epoch 3 training done in 0:20:27
+  Per-genre threshold tuning:
+    Action               best_t=0.75  F1=0.6390
+    Comedy               best_t=0.50  F1=0.6668
+    Drama                best_t=0.50  F1=0.7469
+    Horror               best_t=0.80  F1=0.6890
+    Thriller             best_t=0.70  F1=0.7101
+    Sci-Fi               best_t=0.80  F1=0.7521
+    Fantasy              best_t=0.80  F1=0.6151
+    Romance              best_t=0.65  F1=0.5631
+    Animation            best_t=0.80  F1=0.5599
+    Documentary          best_t=0.80  F1=0.8364
+    Literary Fiction     best_t=0.80  F1=0.6312
+    Non-Fiction          best_t=0.80  F1=0.6867
+
+Validation done in 0:04:07
+Epoch 3/8  |  Val Macro-F1: 0.6747
+Total elapsed: 1:13:47  |  Remaining ETA: 2:02:58
+  -> Saved best model
+  -> Thresholds: {'Action': np.float64(0.75), 'Comedy': np.float64(0.5), 'Drama': np.float64(0.5), 'Horror': np.float64(0.8), 'Thriller': np.float64(0.7), 'Sci-Fi': np.float64(0.8), 'Fantasy': np.float64(0.8), 'Romance': np.float64(0.65), 'Animation': np.float64(0.8), 'Documentary': np.float64(0.8), 'Literary Fiction': np.float64(0.8), 'Non-Fiction': np.float64(0.8)}
+
+─────────────────────────────────────────────────────────────────
+EPOCH 4/8  |  Elapsed: 1:13:58
+─────────────────────────────────────────────────────────────────
+  Step  100/565  |  Loss: 0.4197  |  Step: 2.20s  |  Epoch ETA: 0:16:59  |  Total ETA: 1:57:51
+  Step  200/565  |  Loss: 0.4181  |  Step: 2.16s  |  Epoch ETA: 0:13:17  |  Total ETA: 1:52:34
+  Step  300/565  |  Loss: 0.4214  |  Step: 2.21s  |  Epoch ETA: 0:09:39  |  Total ETA: 1:47:28
+  Step  400/565  |  Loss: 0.4211  |  Step: 2.19s  |  Epoch ETA: 0:06:01  |  Total ETA: 1:42:31
+  Step  500/565  |  Loss: 0.4198  |  Step: 2.16s  |  Epoch ETA: 0:02:22  |  Total ETA: 1:37:39
+
+Epoch 4 training done in 0:20:33
+  Per-genre threshold tuning:
+    Action               best_t=0.65  F1=0.6447
+    Comedy               best_t=0.45  F1=0.6788
+    Drama                best_t=0.45  F1=0.7453
+    Horror               best_t=0.80  F1=0.6977
+    Thriller             best_t=0.75  F1=0.7115
+    Sci-Fi               best_t=0.80  F1=0.7330
+    Fantasy              best_t=0.80  F1=0.6140
+    Romance              best_t=0.75  F1=0.5618
+    Animation            best_t=0.80  F1=0.6264
+    Documentary          best_t=0.80  F1=0.8536
+    Literary Fiction     best_t=0.80  F1=0.6252
+    Non-Fiction          best_t=0.80  F1=0.6962
+
+Validation done in 0:04:06
+Epoch 4/8  |  Val Macro-F1: 0.6824
+Total elapsed: 1:38:39  |  Remaining ETA: 1:38:39
+  -> Saved best model
+  -> Thresholds: {'Action': np.float64(0.65), 'Comedy': np.float64(0.45), 'Drama': np.float64(0.45), 'Horror': np.float64(0.8), 'Thriller': np.float64(0.75), 'Sci-Fi': np.float64(0.8), 'Fantasy': np.float64(0.8), 'Romance': np.float64(0.75), 'Animation': np.float64(0.8), 'Documentary': np.float64(0.8), 'Literary Fiction': np.float64(0.8), 'Non-Fiction': np.float64(0.8)}
+
+─────────────────────────────────────────────────────────────────
+EPOCH 5/8  |  Elapsed: 1:38:44
+─────────────────────────────────────────────────────────────────
+  Step  100/565  |  Loss: 0.3614  |  Step: 2.17s  |  Epoch ETA: 0:16:53  |  Total ETA: 1:33:42
+  Step  200/565  |  Loss: 0.3703  |  Step: 2.18s  |  Epoch ETA: 0:13:17  |  Total ETA: 1:28:47
+  Step  300/565  |  Loss: 0.3727  |  Step: 2.17s  |  Epoch ETA: 0:09:39  |  Total ETA: 1:23:58
+  Step  400/565  |  Loss: 0.3702  |  Step: 2.18s  |  Epoch ETA: 0:06:00  |  Total ETA: 1:19:13
+  Step  500/565  |  Loss: 0.3691  |  Step: 2.16s  |  Epoch ETA: 0:02:21  |  Total ETA: 1:14:34
+
+Epoch 5 training done in 0:20:31
+  Per-genre threshold tuning:
+    Action               best_t=0.65  F1=0.6475
+    Comedy               best_t=0.40  F1=0.6745
+    Drama                best_t=0.50  F1=0.7442
+    Horror               best_t=0.80  F1=0.7045
+    Thriller             best_t=0.70  F1=0.7133
+    Sci-Fi               best_t=0.80  F1=0.7534
+    Fantasy              best_t=0.80  F1=0.6206
+    Romance              best_t=0.70  F1=0.5577
+    Animation            best_t=0.75  F1=0.6341
+    Documentary          best_t=0.80  F1=0.8533
+    Literary Fiction     best_t=0.80  F1=0.6302
+    Non-Fiction          best_t=0.80  F1=0.6087
+
+Validation done in 0:04:07
+Epoch 5/8  |  Val Macro-F1: 0.6785
+Total elapsed: 2:03:24  |  Remaining ETA: 1:14:02
+  -> No improvement (1/5)
+
+─────────────────────────────────────────────────────────────────
+EPOCH 6/8  |  Elapsed: 2:03:24
+─────────────────────────────────────────────────────────────────
+  Step  100/565  |  Loss: 0.3398  |  Step: 2.20s  |  Epoch ETA: 0:16:53  |  Total ETA: 1:09:16
+  Step  200/565  |  Loss: 0.3359  |  Step: 2.17s  |  Epoch ETA: 0:13:16  |  Total ETA: 1:04:34
+  Step  300/565  |  Loss: 0.3360  |  Step: 2.18s  |  Epoch ETA: 0:09:37  |  Total ETA: 0:59:57
+  Step  400/565  |  Loss: 0.3342  |  Step: 2.20s  |  Epoch ETA: 0:05:59  |  Total ETA: 0:55:23
+  Step  500/565  |  Loss: 0.3327  |  Step: 2.18s  |  Epoch ETA: 0:02:21  |  Total ETA: 0:50:53
+
+Epoch 6 training done in 0:20:31
+  Per-genre threshold tuning:
+    Action               best_t=0.75  F1=0.6430
+    Comedy               best_t=0.60  F1=0.6784
+    Drama                best_t=0.40  F1=0.7489
+    Horror               best_t=0.75  F1=0.7072
+    Thriller             best_t=0.60  F1=0.7158
+    Sci-Fi               best_t=0.80  F1=0.7563
+    Fantasy              best_t=0.80  F1=0.6309
+    Romance              best_t=0.80  F1=0.5614
+    Animation            best_t=0.80  F1=0.6339
+    Documentary          best_t=0.65  F1=0.8509
+    Literary Fiction     best_t=0.80  F1=0.6311
+    Non-Fiction          best_t=0.75  F1=0.7081
+
+Validation done in 0:04:07
+Epoch 6/8  |  Val Macro-F1: 0.6888
+Total elapsed: 2:28:03  |  Remaining ETA: 0:49:21
+  -> Saved best model
+  -> Thresholds: {'Action': np.float64(0.75), 'Comedy': np.float64(0.6), 'Drama': np.float64(0.4), 'Horror': np.float64(0.75), 'Thriller': np.float64(0.6), 'Sci-Fi': np.float64(0.8), 'Fantasy': np.float64(0.8), 'Romance': np.float64(0.8), 'Animation': np.float64(0.8), 'Documentary': np.float64(0.65), 'Literary Fiction': np.float64(0.8), 'Non-Fiction': np.float64(0.75)}
+
+─────────────────────────────────────────────────────────────────
+EPOCH 7/8  |  Elapsed: 2:28:05
+─────────────────────────────────────────────────────────────────
+  Step  100/565  |  Loss: 0.3174  |  Step: 2.18s  |  Epoch ETA: 0:16:54  |  Total ETA: 0:44:46
+  Step  200/565  |  Loss: 0.3166  |  Step: 2.18s  |  Epoch ETA: 0:13:16  |  Total ETA: 0:40:14
+  Step  300/565  |  Loss: 0.3148  |  Step: 2.18s  |  Epoch ETA: 0:09:38  |  Total ETA: 0:35:45
+  Step  400/565  |  Loss: 0.3126  |  Step: 2.15s  |  Epoch ETA: 0:06:00  |  Total ETA: 0:31:19
+  Step  500/565  |  Loss: 0.3108  |  Step: 2.16s  |  Epoch ETA: 0:02:21  |  Total ETA: 0:26:55
+
+Epoch 7 training done in 0:20:30
+  Per-genre threshold tuning:
+    Action               best_t=0.70  F1=0.6462
+    Comedy               best_t=0.50  F1=0.6769
+    Drama                best_t=0.40  F1=0.7476
+    Horror               best_t=0.80  F1=0.7099
+    Thriller             best_t=0.65  F1=0.7134
+    Sci-Fi               best_t=0.80  F1=0.7584
+    Fantasy              best_t=0.75  F1=0.6226
+    Romance              best_t=0.70  F1=0.5559
+    Animation            best_t=0.80  F1=0.6448
+    Documentary          best_t=0.70  F1=0.8564
+    Literary Fiction     best_t=0.80  F1=0.6381
+    Non-Fiction          best_t=0.80  F1=0.7704
+
+Validation done in 0:04:07
+Epoch 7/8  |  Val Macro-F1: 0.6951
+Total elapsed: 2:52:43  |  Remaining ETA: 0:24:40
+  -> Saved best model
+  -> Thresholds: {'Action': np.float64(0.7), 'Comedy': np.float64(0.5), 'Drama': np.float64(0.4), 'Horror': np.float64(0.8), 'Thriller': np.float64(0.65), 'Sci-Fi': np.float64(0.8), 'Fantasy': np.float64(0.75), 'Romance': np.float64(0.7), 'Animation': np.float64(0.8), 'Documentary': np.float64(0.7), 'Literary Fiction': np.float64(0.8), 'Non-Fiction': np.float64(0.8)}
+
+─────────────────────────────────────────────────────────────────
+EPOCH 8/8  |  Elapsed: 2:52:54
+─────────────────────────────────────────────────────────────────
+  Step  100/565  |  Loss: 0.3035  |  Step: 2.17s  |  Epoch ETA: 0:17:01  |  Total ETA: 0:20:14
+  Step  200/565  |  Loss: 0.3022  |  Step: 2.20s  |  Epoch ETA: 0:13:19  |  Total ETA: 0:15:49
+  Step  300/565  |  Loss: 0.3001  |  Step: 2.18s  |  Epoch ETA: 0:09:39  |  Total ETA: 0:11:26
+  Step  400/565  |  Loss: 0.2998  |  Step: 2.20s  |  Epoch ETA: 0:06:00  |  Total ETA: 0:07:06
+  Step  500/565  |  Loss: 0.3006  |  Step: 2.20s  |  Epoch ETA: 0:02:22  |  Total ETA: 0:02:47
+
+Epoch 8 training done in 0:20:33
+  Per-genre threshold tuning:
+    Action               best_t=0.75  F1=0.6450
+    Comedy               best_t=0.45  F1=0.6762
+    Drama                best_t=0.40  F1=0.7478
+    Horror               best_t=0.80  F1=0.7108
+    Thriller             best_t=0.70  F1=0.7125
+    Sci-Fi               best_t=0.80  F1=0.7589
+    Fantasy              best_t=0.80  F1=0.6247
+    Romance              best_t=0.65  F1=0.5566
+    Animation            best_t=0.80  F1=0.6434
+    Documentary          best_t=0.70  F1=0.8567
+    Literary Fiction     best_t=0.75  F1=0.6365
+    Non-Fiction          best_t=0.80  F1=0.7647
+
+Validation done in 0:04:07
+Epoch 8/8  |  Val Macro-F1: 0.6945
+Total elapsed: 3:17:36  |  Remaining ETA: 0:00:00
+  -> No improvement (1/5)
+
+=================================================================
+Training complete. Total time: 3:17:36
+Best Val Macro-F1: 0.6951
+=================================================================
+
+Loading best model for final test evaluation...
+  Per-genre threshold tuning:
+    Action               best_t=0.70  F1=0.6462
+    Comedy               best_t=0.50  F1=0.6769
+    Drama                best_t=0.40  F1=0.7476
+    Horror               best_t=0.80  F1=0.7099
+    Thriller             best_t=0.65  F1=0.7134
+    Sci-Fi               best_t=0.80  F1=0.7584
+    Fantasy              best_t=0.75  F1=0.6226
+    Romance              best_t=0.70  F1=0.5559
+    Animation            best_t=0.80  F1=0.6448
+    Documentary          best_t=0.70  F1=0.8564
+    Literary Fiction     best_t=0.80  F1=0.6381
+    Non-Fiction          best_t=0.80  F1=0.7704
+
+=== RoBERTa-Optimal Test Results (per-genre thresholds) ===
+Micro-F1:     0.6951
+Macro-F1:     0.6870
+Hamming Loss: 0.0975
+                  precision    recall  f1-score   support
+
+          Action       0.58      0.72      0.64      1247
+          Comedy       0.64      0.74      0.69      1958
+           Drama       0.67      0.86      0.75      3135
+          Horror       0.67      0.76      0.71       785
+        Thriller       0.67      0.77      0.71      1913
+          Sci-Fi       0.77      0.74      0.75       902
+         Fantasy       0.54      0.70      0.61       710
+         Romance       0.50      0.66      0.57      1066
+       Animation       0.58      0.67      0.62       286
+     Documentary       0.84      0.85      0.84       581
+Literary Fiction       0.51      0.85      0.64       718
+     Non-Fiction       0.64      0.77      0.70        64
+
+       micro avg       0.63      0.77      0.70     13365
+       macro avg       0.63      0.76      0.69     13365
+    weighted avg       0.64      0.77      0.70     13365
+     samples avg       0.68      0.81      0.70     13365
+
+
+Evaluation done in 0:08:13
+Total session time: 3:25:50

@@ -1,0 +1,47 @@
+================================================================================
+INFERENCE RESULTS
+================================================================================
+
+Input 1
+Text: A cybernetic soldier fights rogue AI controlling a dystopian megacity....
+
+Top Predictions:
+  Sci-Fi               99.85%
+  Action               96.53%
+  Animation            63.48%
+  Thriller             51.66%
+
+Other notable scores (>5%):
+  Comedy               10.71%
+  Drama                15.71%
+  Horror               8.34%
+  Fantasy              32.69%
+  Romance              8.14%
+--------------------------------------------------------------------------------
+
+Input 2
+Text: Two childhood friends reunite years later and rediscover their love....
+
+Top Predictions:
+  Romance              98.29%
+  Drama                90.33%
+  Comedy               65.23%
+
+Other notable scores (>5%):
+  Action               6.51%
+  Animation            8.20%
+--------------------------------------------------------------------------------
+
+Input 3
+Text: An abandoned hospital hides a terrifying supernatural entity....
+
+Top Predictions:
+  Horror               99.76%
+  Thriller             58.06%
+
+Other notable scores (>5%):
+  Comedy               9.93%
+  Drama                6.71%
+  Sci-Fi               20.70%
+  Fantasy              33.54%
+--------------------------------------------------------------------------------

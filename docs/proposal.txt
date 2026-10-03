@@ -1,0 +1,15 @@
+Project Title: Genre classification using book and film description
+
+Project Scope:
+The scope of this project is to develop a complete end to end ML pipeline to classify the genre of text narratives(movies, books).The model would be able to classify multiple genres. The scope also includes data preprocessing, and implementing three different models (in increasing accuracy) as baseline, SOTA(DeBERTa-v3) and long context model.
+Planned Approach: 
+Data Preparation and Baseline. The dataset will be CMU book summary and Kaggle Movies Dataset (https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset). A DistilBERT model will be used and fine tuned as baseline model.
+DeBERTa-v3 will be used after baseline. This model should improve upon the baseline as it represents the word using two separate vectors: one for content and one for relative position. This should allow the model to better understand the subtle meanings of specific genre.
+(if hardware requirement met ) will try to improve the book summary classification using the Long-Context Handling (Longformer). It overcome the 512 token limitation of standard transformers, it process sequences up to 4096 tokens which allows for finding the hidden cues as long summaries are not truncated.
+
+Expected Outcome:
+ A high accuracy inference pipeline(deployed via hugging face or alternatives) where the users will input a plot and get a list of genres.
+
+This project would need:
+ Genre classification with Topic Modeling
+Mismatch detection - how much a movie is modified from the book over which the movie is made of

@@ -1,0 +1,20 @@
+Group Project Reports
+The project report may be in slide format / running text Word document.
+
+We expect no more than 10 slides (or 6-8 pages of typed document) to cover the following:
+
+a) Clear name of participants in the project along with the project title
+
+b) Problem definition / Scope / what is getting built?
+
+c) Planned approach with justification of choosing the approach
+
+d) Any extension of past project / critic of the past project
+
+e) Implementation details
+
+f) Results and discussions
+
+g) How could you improve? Why do you think that improvement is possible in the manner you suggested?
+
+Look into the sample project report attached. No need to include code in the report.

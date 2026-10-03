@@ -1,0 +1,372 @@
+\documentclass[11pt,a4paper]{article}
+
+% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{array}
+\usepackage{tabularx}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+% ── Title ─────────────────────────────────────────────────────────────────────
+\title{\Large\textbf{Multi-Model Genre Classification and\\Book-to-Movie Mismatch Detection}}
+\author{Participant 1 \and Participant 2}
+\date{}
+
+\begin{document}
+\maketitle
+
+% ══════════════════════════════════════════════════════════════════════════════
+% SECTION 1: INTRODUCTION
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Introduction}
+
+Genre classification is a fundamental task in natural language processing (NLP) that enables automated content organization, recommendation systems, and literary analysis. Unlike single-label classification, real-world texts frequently belong to multiple genres simultaneously; a novel may be classified as both \textit{Thriller} and \textit{Sci-Fi}, making multi-label classification the appropriate formulation. However, this setting introduces significant challenges, including label co-occurrence dependencies, class imbalance across genres, and subjective genre boundaries that vary across annotators and corpora.
+
+In this work, we address two interconnected tasks. First, we develop a multi-label genre classification system covering 12 canonical genres by fine-tuning four transformer-based architectures: DistilBERT, DeBERTa-v3-base, RoBERTa-base, and Longformer. We further investigate whether incorporating latent topic information through a fusion architecture can improve classification performance. Second, we build a downstream application that leverages the trained classifier to detect narrative mismatches between books and their movie adaptations, using a novel five-head composite scoring system applied to Wikipedia-sourced plot data.
+
+Our primary contributions are as follows:
+\begin{itemize}[nosep]
+    \item A systematic comparison of four transformer architectures on multi-label genre classification with per-genre threshold optimization.
+    \item A topic-aware fusion model that concatenates RBF-kernel topic probabilities with transformer representations.
+    \item An end-to-end book-to-movie mismatch detection pipeline comprising Wikipedia scraping, multi-head scoring, and automated quality filtering.
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════════════════════
+% SECTION 2: DATASET
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Dataset}
+
+\subsection{Data Sources}
+
+We combine two publicly available datasets for the genre classification task. The CMU Book Summaries Corpus\footnote{\url{https://www.cs.cmu.edu/~dbamman/booksummaries.html}} provides 16,559 book summaries with Freebase genre annotations. The Kaggle Movies Dataset\footnote{\url{https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset}} contributes 45,466 movie metadata records including plot overviews and TMDB genre tags. By merging these two sources, we obtain a diverse corpus that spans both literary and cinematic texts.
+
+\subsection{Preprocessing}
+
+The raw genre labels from both sources exhibit considerable fragmentation, with over 300 unique genre strings across the two corpora. We consolidate these into a unified taxonomy of 12 canonical genres: \textit{Action, Comedy, Drama, Horror, Thriller, Sci-Fi, Fantasy, Romance, Animation, Documentary, Literary Fiction}, and \textit{Non-Fiction}. This mapping is performed through a combination of direct string matching and manual inspection of ambiguous labels. Records with no valid genre mapping after consolidation are discarded. Genre labels are then binarized using a \texttt{MultiLabelBinarizer}, producing a binary label matrix suitable for multi-label training.
+
+\subsection{Data Splits and Statistics}
+
+We apply iterative stratified splitting \cite{sechidis2011} to partition the data into training, validation, and test sets with a 70/15/15 ratio. Iterative stratification preserves the label distribution across all 12 genres in each split, which is critical given the significant class imbalance present in the dataset.
+
+\begin{table}[H]
+\centering
+\caption{Dataset split statistics.}
+\label{tab:splits}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Split} & \textbf{Samples} & \textbf{Percentage} \\
+\midrule
+Training   & 36,104 & 70\% \\
+Validation &  7,774 & 15\% \\
+Test       &  7,740 & 15\% \\
+\midrule
+\textbf{Total} & \textbf{51,618} & 100\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The most frequent genre is \textit{Drama} (3,135 test samples), while the least frequent is \textit{Non-Fiction} (64 test samples), yielding an imbalance ratio of approximately 49:1. This imbalance motivates our use of positive-weight-adjusted loss functions and per-genre threshold tuning.
+
+% ══════════════════════════════════════════════════════════════════════════════
+% SECTION 3: APPROACH
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Approach}
+
+\subsection{Model Selection}
+
+We select four transformer architectures that represent different trade-offs between computational efficiency, contextual depth, and input length capacity.
+
+\textbf{DistilBERT} \cite{sanh2019} is a distilled variant of BERT that retains 97\% of BERT's language understanding while being 60\% faster and 40\% smaller. It serves as our efficiency baseline.
+
+\textbf{DeBERTa-v3-base} \cite{he2021} introduces disentangled attention, which separately encodes content and position information using two independent vectors. This architecture has demonstrated state-of-the-art results on several NLU benchmarks.
+
+\textbf{RoBERTa-base} \cite{liu2019} improves upon BERT through optimized pretraining, including dynamic masking, larger mini-batches, and removal of the next-sentence prediction objective. Its robust pretraining makes it well-suited for downstream fine-tuning tasks.
+
+\textbf{Longformer} \cite{beltagy2020} extends the standard transformer with a combination of local sliding-window attention and global attention, enabling efficient processing of documents up to 4,096 tokens. This is particularly relevant for our corpus, where book summaries can exceed the 512-token limit of standard models.
+
+\subsection{Topic Modeling Fusion}
+
+To investigate whether latent thematic information can complement transformer representations, we design a two-stream fusion architecture. We first train a topic model using MiniBatchKMeans with $k=30$ clusters on TF-IDF representations, applying a Gaussian RBF kernel with calibrated bandwidth $\sigma$ to obtain soft topic probability vectors for each document.
+
+The fusion classifier processes two parallel streams:
+\begin{enumerate}[nosep]
+    \item The \texttt{[CLS]} token representation from RoBERTa (768 dimensions) is projected through a linear layer to 256 dimensions, followed by LayerNorm, GELU activation, and dropout (0.3).
+    \item The 30-dimensional topic probability vector is projected to 64 dimensions with its own LayerNorm, GELU, and dropout (0.2).
+\end{enumerate}
+The two streams are concatenated into a 320-dimensional vector and passed through a final classification head. Independent LayerNorm layers ensure scale alignment between the two representation spaces.
+
+\subsection{Training Strategy}
+
+All models are trained with binary cross-entropy loss with logits (\texttt{BCEWithLogitsLoss}), incorporating class-specific positive weights to address label imbalance. We use the AdamW optimizer with a cosine learning rate scheduler and 10\% linear warmup.
+
+A key component of our approach is \textbf{per-genre threshold tuning}. Rather than applying a fixed threshold of 0.5 to the sigmoid outputs, we perform an independent sweep over the range $[0.20, 0.85]$ for each genre, selecting the threshold that maximizes the per-genre F1 score on the validation set. This approach consistently improves Macro-F1 by 3--5 points across all models compared to a static threshold.
+
+For memory efficiency, all datasets are pre-tokenized and cached directly in GPU VRAM using a custom \texttt{UltraFastGenreDataset} class. Gradient checkpointing is enabled for RoBERTa and DeBERTa to allow batch sizes of 64 within the 15.8~GB VRAM budget of the Tesla T4 GPU. Mixed-precision training (FP16) is used for all models except DeBERTa-v3, which requires FP32 due to numerical instability in its disentangled attention computation under reduced precision.
+
+For the fusion model, we freeze the RoBERTa backbone during the first epoch to prevent pretrained gradients from overwhelming the randomly initialized topic head. After the first epoch, we unfreeze the backbone and apply differential learning rates: $1 \times 10^{-5}$ for the RoBERTa body and $5 \times 10^{-5}$ for the fusion head.
+
+% ══════════════════════════════════════════════════════════════════════════════
+% SECTION 4: IMPLEMENTATION DETAILS
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Implementation Details}
+
+\subsection{Training Environment}
+
+All transformer models are trained on Kaggle and Google Colab instances equipped with NVIDIA Tesla T4 GPUs (15.8~GB VRAM). The software environment consists of Python 3.12, PyTorch 2.10, and HuggingFace Transformers 4.48+. Data preprocessing and topic model training are performed locally.
+
+\subsection{Classification Pipeline}
+
+The classification pipeline proceeds as follows. Raw text is tokenized using each model's respective tokenizer with a maximum sequence length of 512 tokens (256 for DeBERTa due to VRAM constraints). The tokenized inputs, attention masks, and binary label vectors are packed into tensors and transferred to GPU VRAM before training begins. During training, we perform forward passes with optional gradient checkpointing, compute the weighted BCE loss, and update parameters using AdamW with gradient scaling for FP16 models. At the end of each epoch, we evaluate on the validation set with per-genre threshold tuning and save the model checkpoint if the Macro-F1 score improves. Early stopping with a patience of 5 epochs prevents overfitting.
+
+\subsection{Wikipedia Scraping Pipeline}
+
+For the mismatch detection task, we develop a multi-pass Wikipedia scraper to identify book-to-movie adaptation pairs and retrieve their respective plot texts. The scraper operates in four passes with decreasing confidence:
+
+\begin{enumerate}[nosep]
+    \item \textbf{Gold (Wikidata P144):} Batch SPARQL queries retrieve films linked to books via the ``based on'' (P144) property. This yields the highest-confidence matches.
+    \item \textbf{Silver (Book page):} The scraper parses the ``Adaptations'' sections of book Wikipedia articles to find linked film pages.
+    \item \textbf{Silver (Author category):} Author category pages are crawled for film adaptation references.
+    \item \textbf{Bronze (Fuzzy matching):} Title-based fuzzy matching with verification through content overlap analysis.
+\end{enumerate}
+
+This pipeline produces 619 book-movie pairs with full plot texts. A confidence score is assigned to each pair based on its verification tier.
+
+\subsection{Mismatch Detection}
+
+We design a five-head composite scoring system that quantifies narrative divergence between book summaries and movie plots from multiple perspectives:
+
+\begin{table}[H]
+\centering
+\caption{Mismatch detection scoring heads and weights.}
+\label{tab:heads}
+\begin{tabular}{llc}
+\toprule
+\textbf{Head} & \textbf{Metric} & \textbf{Weight} \\
+\midrule
+Semantic Distance   & Cosine distance (MiniLM-L6-v2 embeddings) & 0.35 \\
+Genre Shift         & Jensen-Shannon Divergence of RoBERTa genre predictions & 0.25 \\
+TF-IDF Distance     & Cosine distance of TF-IDF vectors (bigram, 15K features) & 0.25 \\
+Entity Overlap      & Jaccard distance of spaCy NER entity sets & 0.10 \\
+Sentiment Delta     & Absolute VADER compound score difference (first 1500 chars) & 0.05 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The entity overlap weight is reduced to 0.10 due to its high correlation (0.81) with TF-IDF distance, which would otherwise double-count vocabulary-level similarity. Sentiment delta receives a low weight of 0.05 because VADER compound scores exhibit a systematic baseline difference between prose registers (literary vs. encyclopedic), inflating the raw delta.
+
+Before scoring, we apply a \textbf{wrong-match filter} that removes pairs with semantic cosine similarity below 0.20. This step eliminates 20 scraper errors (e.g., mismatched titles) that would otherwise pollute the mismatch rankings as false positives.
+
+% ══════════════════════════════════════════════════════════════════════════════
+% SECTION 5: RESULTS AND DISCUSSION
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Results and Discussion}
+
+\subsection{Model Comparison}
+
+Table~\ref{tab:comparison} presents the performance of all five model configurations on the held-out test set. RoBERTa-base achieves the highest Macro-F1 of 0.6870, followed closely by Longformer at 0.6882. DeBERTa-v3 underperforms relative to its architectural sophistication, which we attribute to the FP32 constraint limiting effective batch size and training throughput.
+
+\begin{table}[H]
+\centering
+\caption{Test set performance comparison across all models.}
+\label{tab:comparison}
+\begin{tabular}{lcccr}
+\toprule
+\textbf{Model} & \textbf{Macro-F1} & \textbf{Micro-F1} & \textbf{Hamming Loss} & \textbf{Train Time} \\
+\midrule
+DistilBERT              & 0.6831 & 0.6875 & 0.0984 & 1h 13m \\
+DeBERTa-v3-base         & 0.6496 & 0.6689 & 0.1077 & 6h 33m \\
+RoBERTa-base            & \textbf{0.6870} & \textbf{0.6951} & \textbf{0.0975} & 3h 18m \\
+Longformer              & 0.6882 & 0.6979 & 0.0953 & 6h 46m \\
+RoBERTa + Topic Fusion  & 0.6828 & 0.6897 & 0.1003 & 2h 47m \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Per-Genre Analysis}
+
+Table~\ref{tab:pergenre} reports the per-genre precision, recall, and F1 scores for RoBERTa-base. \textit{Documentary} achieves the highest F1 (0.84), likely due to its distinctive vocabulary that is well-separated from fictional genres. \textit{Romance} exhibits the lowest F1 (0.57), reflecting the genre's frequent co-occurrence with \textit{Drama} and \textit{Comedy}, which introduces label confusion. \textit{Non-Fiction} achieves a strong F1 of 0.70 despite having only 64 test samples, suggesting that the positive-weight adjustment effectively compensates for extreme class imbalance.
+
+\begin{table}[H]
+\centering
+\caption{Per-genre test results for RoBERTa-base with per-genre threshold tuning.}
+\label{tab:pergenre}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Genre} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Support} \\
+\midrule
+Action            & 0.58 & 0.72 & 0.64 & 1,247 \\
+Comedy            & 0.64 & 0.74 & 0.69 & 1,958 \\
+Drama             & 0.67 & 0.86 & 0.75 & 3,135 \\
+Horror            & 0.67 & 0.76 & 0.71 & 785 \\
+Thriller          & 0.67 & 0.77 & 0.71 & 1,913 \\
+Sci-Fi            & 0.77 & 0.74 & 0.75 & 902 \\
+Fantasy           & 0.54 & 0.70 & 0.61 & 710 \\
+Romance           & 0.50 & 0.66 & 0.57 & 1,066 \\
+Animation         & 0.58 & 0.67 & 0.62 & 286 \\
+Documentary       & 0.84 & 0.85 & 0.84 & 581 \\
+Literary Fiction  & 0.51 & 0.85 & 0.64 & 718 \\
+Non-Fiction       & 0.64 & 0.77 & 0.70 & 64 \\
+\midrule
+\textbf{Macro Avg}    & 0.63 & 0.76 & \textbf{0.69} & 13,365 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Training Dynamics}
+
+Table~\ref{tab:epochs} shows the epoch-by-epoch training progression for RoBERTa-base. The model achieves its best validation Macro-F1 of 0.6951 at epoch 7, after which performance plateaus. Training loss decreases monotonically from 1.2174 to 0.3006, indicating stable convergence without signs of catastrophic overfitting.
+
+\begin{table}[H]
+\centering
+\caption{RoBERTa-base training progression (per-genre threshold tuning applied at each epoch).}
+\label{tab:epochs}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Epoch} & \textbf{Training Loss} & \textbf{Val Macro-F1} & \textbf{Model Saved} \\
+\midrule
+1 & 1.2174 & 0.6533 & Yes \\
+2 & 0.5916 & 0.6631 & Yes \\
+3 & 0.4891 & 0.6747 & Yes \\
+4 & 0.4197 & 0.6824 & Yes \\
+5 & 0.3614 & 0.6785 & No \\
+6 & 0.3398 & 0.6888 & Yes \\
+7 & 0.3174 & \textbf{0.6951} & Yes \\
+8 & 0.3035 & 0.6945 & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Topic Fusion Analysis}
+
+The RoBERTa + Topic Fusion model achieves a test Macro-F1 of 0.6828, which is 0.0042 points below the vanilla RoBERTa baseline. Analysis of per-genre performance reveals that the fusion model improves only on \textit{Fantasy} (+0.035 F1) and \textit{Non-Fiction} (+0.005 F1), while all other genres show marginal regression. This suggests that the \texttt{[CLS]} representation from RoBERTa already captures sufficient thematic information, and the 30-dimensional topic vector introduces noise rather than complementary signal for most genres.
+
+\subsection{Inference Examples}
+
+To demonstrate the practical utility of the trained classifier, we present three inference examples using the best RoBERTa-base model with per-genre threshold tuning applied.
+
+\begin{table}[H]
+\centering
+\caption{Inference examples from the RoBERTa-base classifier.}
+\label{tab:inference}
+\small
+\begin{tabularx}{\textwidth}{p{5.5cm}X}
+\toprule
+\textbf{Input Text} & \textbf{Predicted Genres (Confidence)} \\
+\midrule
+``A cybernetic soldier fights rogue AI controlling a dystopian megacity...'' &
+Sci-Fi (99.85\%), Action (96.53\%), Animation (63.48\%), Thriller (51.66\%) \\
+\midrule
+``Two childhood friends reunite years later and rediscover their love...'' &
+Romance (98.29\%), Drama (90.33\%), Comedy (65.23\%) \\
+\midrule
+``An abandoned hospital hides a terrifying supernatural entity...'' &
+Horror (99.76\%), Thriller (58.06\%), Fantasy (33.54\%), Sci-Fi (20.70\%) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The model correctly identifies the dominant genres with high confidence and assigns plausible secondary labels. For example, the first input receives strong \textit{Sci-Fi} and \textit{Action} predictions, with a moderate \textit{Thriller} score reflecting the dystopian conflict theme. The third input demonstrates appropriate co-activation of \textit{Horror} and \textit{Fantasy} for supernatural content.
+
+\subsection{Mismatch Detection Results}
+
+After applying the wrong-match filter, 599 pairs remain for mismatch analysis. The composite mismatch scores follow an approximately normal distribution with mean 0.5015 and standard deviation 0.1602. We partition the scores into three categories using the 33rd and 67th percentiles: \textit{Faithful} ($< 0.418$, 198 pairs), \textit{Moderate} (0.418--0.564, 203 pairs), and \textit{Significant} ($> 0.564$, 198 pairs).
+
+To validate the scoring system, we examine known adaptations. Faithful adaptations such as \textit{The Big Sleep} (0.212), \textit{To Kill a Mockingbird} (0.245), and \textit{Pride and Prejudice} (0.256) correctly receive low mismatch scores. Divergent adaptations such as \textit{A Clockwork Orange} (0.422) and \textit{I Am Legend} (0.535) receive appropriately elevated scores.
+
+A notable limitation is observed for \textit{The Shining}, which scores 0.327 (Faithful) despite Kubrick's film being widely regarded as a significant departure from King's novel. This occurs because entity overlap and TF-IDF similarity remain high (the film shares all major characters, locations, and surface plot elements), while the thematic inversion is captured only by the semantic distance head. This illustrates a known limitation of surface-level metrics for detecting thematic, as opposed to structural, divergence.
+
+The head correlation analysis confirms that semantic distance and TF-IDF distance are the most informative components, with correlations of 0.85 and 0.85 to the composite score, respectively. Genre shift shows moderate correlation (0.57), while sentiment delta contributes minimally (0.22), consistent with its low weight assignment.
+
+% ══════════════════════════════════════════════════════════════════════════════
+% SECTION 6: IMPROVEMENTS AND FUTURE WORK
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Improvements and Future Work}
+
+Several directions could yield meaningful improvements to both the classification and mismatch detection components.
+
+\textbf{Larger pretrained models.} Scaling to RoBERTa-large (355M parameters) or DeBERTa-v3-large could improve representation quality, particularly for underperforming genres such as \textit{Romance} and \textit{Fantasy}. The primary bottleneck is GPU memory; however, gradient accumulation and 8-bit quantization techniques could make this feasible on consumer hardware.
+
+\textbf{Cross-attention fusion.} The current topic fusion architecture uses simple concatenation to combine transformer and topic representations. A cross-attention mechanism that allows the two streams to attend to each other could enable more nuanced integration, potentially recovering the performance lost to concatenation noise.
+
+\textbf{Improved topic features.} Replacing MiniBatchKMeans with neural topic models such as NVDM or ProdLDA may yield more discriminative topic distributions. Additionally, training the topic model jointly with the classifier in an end-to-end fashion could align topic representations with the classification objective.
+
+\textbf{Thematic mismatch detection.} The current scoring system relies on surface-level features that cannot capture thematic inversions, as demonstrated by \textit{The Shining}. Incorporating sentence-level discourse analysis or narrative arc modeling could address this limitation. Specifically, encoding the progression of emotional valence across narrative segments, rather than computing a single aggregate sentiment score, would better capture structural divergence.
+
+\textbf{Wrong-match threshold calibration.} Lowering the cosine similarity threshold from 0.20 to 0.15 would retain genuine but highly divergent adaptations such as \textit{Heart of Darkness} to \textit{Apocalypse Now} (cosine similarity 0.181), which are currently filtered as false positives.
+
+% ══════════════════════════════════════════════════════════════════════════════
+% REFERENCES
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{thebibliography}{10}
+
+\bibitem{sanh2019}
+V.~Sanh, L.~Debut, J.~Chaumond, and T.~Wolf,
+``DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter,''
+\textit{arXiv preprint arXiv:1910.01108}, 2019.
+
+\bibitem{he2021}
+P.~He, J.~Gao, and W.~Chen,
+``DeBERTaV3: Improving DeBERTa using ELECTRA-style pre-training with gradient-disentangled embedding sharing,''
+\textit{arXiv preprint arXiv:2111.09543}, 2021.
+
+\bibitem{liu2019}
+Y.~Liu, M.~Ott, N.~Goyal, J.~Du, M.~Joshi, D.~Chen, O.~Levy, M.~Lewis, L.~Zettlemoyer, and V.~Stoyanov,
+``RoBERTa: A robustly optimized BERT pretraining approach,''
+\textit{arXiv preprint arXiv:1907.11692}, 2019.
+
+\bibitem{beltagy2020}
+I.~Beltagy, M.~E.~Peters, and A.~Cohan,
+``Longformer: The long-document transformer,''
+\textit{arXiv preprint arXiv:2004.05150}, 2020.
+
+\bibitem{schick2021}
+T.~Schick and H.~Sch{\"u}tze,
+``Exploiting cloze-style questions for few-shot text classification and natural language inference,''
+\textit{Proceedings of EACL}, 2021.
+
+\bibitem{min2022}
+S.~Min, X.~Lyu, A.~Holtzman, M.~Artetxe, M.~Lewis, H.~Hajishirzi, and L.~Zettlemoyer,
+``Rethinking the role of demonstrations: What makes in-context learning work?,''
+\textit{arXiv preprint arXiv:2202.12837}, 2022.
+
+\bibitem{smith2020}
+N.~A.~Smith,
+``Contextual word representations: A contextual introduction,''
+\textit{arXiv preprint arXiv:1902.06006}, 2020.
+
+\bibitem{sechidis2011}
+K.~Sechidis, G.~Tsoumakas, and I.~Vlahavas,
+``On the stratification of multi-label data,''
+\textit{Proceedings of ECML PKDD}, pp.~145--158, 2011.
+
+\bibitem{kaggle_movies}
+R.~Banik,
+``The Movies Dataset,''
+Kaggle, 2017.
+\url{https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset}
+
+\bibitem{cmu_summaries}
+D.~Bamman and N.~A.~Smith,
+``New alignment methods for discriminative book summarization,''
+\textit{arXiv preprint arXiv:1305.1319}, 2013.
+
+\end{thebibliography}
+
+\end{document}

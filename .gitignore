@@ -6,12 +6,8 @@ __pycache__/
 # Model weights (ignore all .pt files in models directory)
 models/*.pt
 
-# Large data files (>25MB — regenerate via notebooks or download from dataset sources)
+# Large data files (>50MB — regenerate via notebooks or download from dataset sources)
 data/processed/all_embeddings.npy
-data/processed/data_splits.pkl
-data/processed/cmu_cleaned.csv
-data/raw/booksummaries.txt
-data/raw/movies_metadata.csv
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
